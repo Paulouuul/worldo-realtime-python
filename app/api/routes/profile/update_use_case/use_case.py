@@ -146,7 +146,7 @@ class UpdateProfileUseCase:
         # VALIDAÇÃO DO WEBSITE
         
         if request.website is not None:
-            website = request.website.strip() if request.website else ''
+            website = request.website.strip() if request.website else None
             if len(website) > self.MAX_WEBSITE_LENGTH:
                 raise ValueError(f"Website deve ter no máximo {self.MAX_WEBSITE_LENGTH} caracteres")
             
@@ -246,7 +246,7 @@ class UpdateProfileUseCase:
             update_data['location'] = request.location.strip() if request.location else None
         
         if request.website is not None:
-            website = request.website.strip() if request.website else ''
+            website = request.website.strip() if request.website else None
             if website and not website.startswith(('http://', 'https://')):
                 website = f"https://{website}"
             update_data['website'] = website if website else None

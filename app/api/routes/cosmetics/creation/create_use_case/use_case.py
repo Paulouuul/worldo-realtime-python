@@ -57,7 +57,7 @@ class CreateCosmeticFrameUseCase:
                 if len(description) > self.MAX_DESCRIPTION_SIZE:
                     raise ValueError(f"Descrição deve ter no máximo {self.MAX_DESCRIPTION_SIZE} caracteres")
             else:
-                description = ''
+                description = None
                 
                     
             if not payload.get('image'):
@@ -113,7 +113,7 @@ class CreateCosmeticFrameUseCase:
                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                         RETURNING *
                         """,
-                        frame_id, name, description or '', new_image_url, new_thumb_url,
+                        frame_id, name, description, new_image_url, new_thumb_url,
                         package['rarity'], int(package['quantity']), request.user_id, now, now
                     )
                     
