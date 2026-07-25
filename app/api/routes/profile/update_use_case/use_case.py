@@ -98,11 +98,11 @@ class UpdateProfileUseCase:
     async def _validate_request(self, request: UpdateProfileRequest):
         
         # VALIDAÇÃO DO NOME
-        
-        if not request.name or not request.name.strip():
+        name = request.name.strip()
+
+        if not name:
             raise ValueError("Nome é obrigatório")
         
-        name = request.name.strip()
         if len(name) < self.MIN_NAME_LENGTH:
             raise ValueError(f"Nome deve ter pelo menos {self.MIN_NAME_LENGTH} caracteres")
         if len(name) > self.MAX_NAME_LENGTH:
