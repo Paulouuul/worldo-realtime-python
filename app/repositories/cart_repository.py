@@ -69,7 +69,7 @@ class CartRepository:
             data = redis_client.get_json(key)
             
             if not data:
-                logger.info(f"📭 Carrinho não encontrado para usuário: {user_id}")
+                logger.info(f"Carrinho não encontrado para usuário: {user_id}")
                 return None
             
             # Reconstrói a entidade usando from_dict

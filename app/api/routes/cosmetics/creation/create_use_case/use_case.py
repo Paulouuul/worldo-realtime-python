@@ -113,7 +113,7 @@ class CreateCosmeticFrameUseCase:
                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                         RETURNING *
                         """,
-                        frame_id, request.name, request.description or '', new_image_url, new_thumb_url,
+                        frame_id, name, description or '', new_image_url, new_thumb_url,
                         package['rarity'], int(package['quantity']), request.user_id, now, now
                     )
                     
@@ -133,7 +133,7 @@ class CreateCosmeticFrameUseCase:
                         VALUES ($1, $2, $3, $4, $5, $6, $7)
                         """,
                         transaction_id, request.user_id, -total_cost, updated_user['coins'], 'spend',
-                        f"Criação de moldura: {request.name} ({package['rarity']}) - Pacote {package['name']}", now
+                        f"Criação de moldura: {name} ({package['rarity']}) - Pacote {package['name']}", now
                     )
                     
             except Exception as db_err:
