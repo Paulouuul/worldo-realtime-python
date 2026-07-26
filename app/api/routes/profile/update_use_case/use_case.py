@@ -11,6 +11,14 @@ from app.utils.image_utils import convert_to_webp, add_animated_suffix, ConvertO
 
 logger = logging.getLogger(__name__)
 
+URL_REGEX = re.compile(
+    r'^https?://'
+    r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'
+    r'localhost|'
+    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
+    r'(?::\d+)?'
+    r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+
 class UpdateProfileRequest(BaseModel):
     user_id: str
     name: str
@@ -98,7 +106,7 @@ class UpdateProfileUseCase:
     async def _validate_request(self, request: UpdateProfileRequest):
         
         # VALIDAÇÃO DO NOME
-        name = request.name.strip()
+        name = " ".join(request.name.strip().split())
 
         if not name:
             raise ValueError("Nome é obrigatório")
@@ -146,15 +154,16 @@ class UpdateProfileUseCase:
         # VALIDAÇÃO DO WEBSITE
         
         if request.website is not None:
-            website = request.website.strip() if request.website else None
-            if len(website) > self.MAX_WEBSITE_LENGTH:
-                raise ValueError(f"Website deve ter no máximo {self.MAX_WEBSITE_LENGTH} caracteres")
+            website = "".join(request.website.strip().split()) if request.website else None
+            if website is not None:
+                if len(website) > self.MAX_WEBSITE_LENGTH:
+                    raise ValueError(f"Website deve ter no máximo {self.MAX_WEBSITE_LENGTH} caracteres")
+                if not URL_REGEX.match(website):
+                    raise ValueError("URL inválida.")
             
-            # Validação básica de URL (opcional)
+            # Validação básica de URL
             if website and not website.startswith(('http://', 'https://')):
                 website = f"https://{website}"
-                # Poderia armazenar com https:// ou validar
-                # raise ValueError("Website deve começar com http:// ou https://")
         
         
         # VALIDAÇÃO DOS ARQUIVOS
@@ -235,7 +244,7 @@ class UpdateProfileUseCase:
 
     async def _update_user(self, request: UpdateProfileRequest, new_avatar: str, new_cover: str):
         update_data = {
-            'name': request.name.strip(),
+            'name': " ".join(request.name.strip().split()),
             'username': request.username.lower().strip()
         }
         
@@ -246,10 +255,13 @@ class UpdateProfileUseCase:
             update_data['location'] = request.location.strip() if request.location else None
         
         if request.website is not None:
-            website = request.website.strip() if request.website else None
-            if website and not website.startswith(('http://', 'https://')):
-                website = f"https://{website}"
-            update_data['website'] = website if website else None
+            website = "".join(request.website.strip().split()) if request.website else None
+            if website:
+                if not website.startswith(('http://', 'https://')):
+                    website = f"https://{website}"
+                if not URL_REGEX.match(website):
+                    raise ValueError("URL inválida.")
+            update_data['website'] = website
         
         if new_avatar:
             update_data['avatar'] = new_avatar
