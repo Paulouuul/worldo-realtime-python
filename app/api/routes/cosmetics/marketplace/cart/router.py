@@ -11,6 +11,7 @@ from .clear_cart_use_case.use_case import ClearCartUseCase
 from .validate_cart_use_case.use_case import ValidateCartUseCase, ValidateCartRequest
 from .sync_cart_use_case.use_case import SyncCartUseCase, SyncCartRequest
 from .get_item_quantity_use_case.use_case import GetItemQuantityUseCase, GetItemQuantityRequest
+from fastapi.responses import JSONResponse
 
 router = APIRouter()
 
@@ -42,9 +43,9 @@ async def get_my_cart(
     response_data, status_code = await GetCartUseCase().execute(request)
     
     if "error" in response_data:
-        raise HTTPException(
-            status_code=status_code,
-            detail=response_data.get("error")
+        return JSONResponse(
+                status_code=status_code,
+                content={"detail": response_data.get("error")}
         )
     
     return response_data
@@ -60,9 +61,9 @@ async def get_my_cart_summary(
     response_data, status_code = await GetCartUseCase().execute(request)
     
     if "error" in response_data:
-        raise HTTPException(
-            status_code=status_code,
-            detail=response_data.get("error")
+        return JSONResponse(
+                status_code=status_code,
+                content={"detail": response_data.get("error")}
         )
     data = response_data.get("data", {})
     return {
@@ -83,9 +84,9 @@ async def get_item_quantity(
     response_data, status_code = await GetItemQuantityUseCase().execute(request)
     
     if "error" in response_data:
-        raise HTTPException(
-            status_code=status_code,
-            detail=response_data.get("error")
+        return JSONResponse(
+                status_code=status_code,
+                content={"detail": response_data.get("error")}
         )
     
     return response_data
@@ -106,9 +107,9 @@ async def add_item_to_my_cart(
     response_data, status_code = await AddItemUseCase().execute(request)
     
     if "error" in response_data:
-        raise HTTPException(
-            status_code=status_code,
-            detail=response_data.get("error")
+        return JSONResponse(
+                status_code=status_code,
+                content={"detail": response_data.get("error")}
         )
     
     return response_data
@@ -125,9 +126,9 @@ async def remove_item_from_my_cart(
     response_data, status_code = await RemoveItemUseCase().execute(request)
     
     if "error" in response_data:
-        raise HTTPException(
-            status_code=status_code,
-            detail=response_data.get("error")
+        return JSONResponse(
+                status_code=status_code,
+                content={"detail": response_data.get("error")}
         )
     
     return response_data
@@ -149,9 +150,9 @@ async def update_quantity_in_my_cart(
     response_data, status_code = await UpdateQuantityUseCase().execute(request)
     
     if "error" in response_data:
-        raise HTTPException(
-            status_code=status_code,
-            detail=response_data
+        return JSONResponse(
+                status_code=status_code,
+                content={"detail": response_data.get("error")}
         )
     
     return response_data
@@ -166,9 +167,9 @@ async def clear_my_cart(
     response_data, status_code = await ClearCartUseCase().execute(user.id)
     
     if "error" in response_data:
-        raise HTTPException(
-            status_code=status_code,
-            detail=response_data.get("error")
+        return JSONResponse(
+                status_code=status_code,
+                content={"detail": response_data.get("error")}
         )
     
     return response_data
@@ -183,9 +184,9 @@ async def validate_my_cart(
     response_data, status_code = await ValidateCartUseCase().execute(request)
     
     if "error" in response_data:
-        raise HTTPException(
-            status_code=status_code,
-            detail=response_data
+        return JSONResponse(
+                status_code=status_code,
+                content={"detail": response_data.get("error")}
         )
     
     return response_data
@@ -200,9 +201,9 @@ async def sync_my_cart(
     response_data, status_code = await SyncCartUseCase().execute(request)
     
     if "error" in response_data:
-        raise HTTPException(
-            status_code=status_code,
-            detail=response_data.get("error")
+        return JSONResponse(
+                status_code=status_code,
+                content={"detail": response_data.get("error")}
         )
     
     return response_data

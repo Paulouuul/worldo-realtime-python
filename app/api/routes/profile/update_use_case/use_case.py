@@ -109,25 +109,25 @@ class UpdateProfileUseCase:
         # NOME
         name = " ".join(request.name.strip().split())
         if not name:
-            raise ValueError("Nome é obrigatório")
+            raise ValueError("Nome de Exibição é obrigatório")
         if len(name) < self.MIN_NAME_LENGTH or len(name) > self.MAX_NAME_LENGTH:
-            raise ValueError(f"Nome deve ter entre {self.MIN_NAME_LENGTH} e {self.MAX_NAME_LENGTH} caracteres")
+            raise ValueError(f"Nome de Exibição deve ter entre {self.MIN_NAME_LENGTH} e {self.MAX_NAME_LENGTH} caracteres")
         data['name'] = name
 
         # USERNAME
         if not request.username or not request.username.strip():
-            raise ValueError("Username é obrigatório")
+            raise ValueError("Nome de Usuário é obrigatório")
         
         sanitized_username = request.username.lower().strip()
         if not re.match(r'^[a-zA-Z0-9_]{3,30}$', sanitized_username):
-            raise ValueError("Username inválido. Use apenas letras, números e underscore (3-30 caracteres)")
+            raise ValueError("Nome de Usuário inválido. Use apenas letras, números e underscore (3-30 caracteres)")
 
         existing_user = await db.fetch_one(
             'SELECT id FROM users WHERE username = $1 AND id != $2 AND "deletedAt" IS NULL',
             sanitized_username, request.user_id
         )
         if existing_user:
-            raise ValueError("Username já em uso")
+            raise ValueError("Nome de Usuário já em uso")
         data['username'] = sanitized_username
 
         # BIO

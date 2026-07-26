@@ -1,6 +1,7 @@
 # app/api/routes/profile/router.py
 from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from fastapi.responses import JSONResponse
 import logging
 from app.auth.dependencies import get_current_user
 from app.auth.schemas import UserInfo
@@ -62,10 +63,10 @@ async def update_my_profile(
         response_data, status_code = await use_case.execute(payload)
         
         if "error" in response_data:
-            logger.error(f"Erro no use_case: {response_data.get('error')}")
-            raise HTTPException(
+            logger.error(f"Erro na edição de perfil: {response_data.get('error')}")
+            return JSONResponse(
                 status_code=status_code,
-                detail=response_data.get("error")
+                content={"detail": response_data.get("error")}
             )
         
         return response_data
