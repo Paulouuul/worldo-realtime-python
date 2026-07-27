@@ -44,7 +44,7 @@ class CreateCosmeticFrameUseCase:
                 raise ValueError("Campos obrigatórios inválidos ou faltando (name, package_id)")
             
              # Validação de tamanho do nome
-            name = payload.get('name', '').strip()
+            name = " ".join(payload.get('name', '').strip().split())
             if len(name) > self.MAX_NAME_SIZE:
                 raise ValueError(f"Nome deve ter no máximo {self.MAX_NAME_SIZE} caracteres")
             if len(name) < 3:
