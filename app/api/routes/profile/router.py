@@ -1,7 +1,7 @@
 # app/api/routes/profile/router.py
 from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
-from fastapi.responses import JSONResponse
+from app.utils.response import success_response, error_response
 import logging
 from app.auth.dependencies import get_current_user
 from app.auth.schemas import UserInfo
@@ -64,15 +64,14 @@ async def update_my_profile(
         
         if "error" in response_data:
             logger.error(f"Erro na edição de perfil: {response_data.get('error')}")
-            return JSONResponse(
-                status_code=status_code,
-                content={"detail": response_data.get("error")}
-            )
+            error_response(response_data["error"], status_code)
         
-        return response_data
-        
+        return success_response(response_data)
+
+    except HTTPException:
+        raise
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        error_response(str(e), 400)
     except Exception as e:
         logger.error(f"Erro inesperado: {e}")
-        raise HTTPException(status_code=500, detail="Erro interno ao processar requisição")
+        error_response("Erro interno ao processar requisição", 500)

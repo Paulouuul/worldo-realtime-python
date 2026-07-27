@@ -4,7 +4,7 @@ import logging
 from app.auth.dependencies import get_current_user
 from app.auth.schemas import UserInfo
 from .create_use_case.use_case import CreateCosmeticFrameUseCase
-from fastapi.responses import JSONResponse
+from app.utils.response import success_response, error_response
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
@@ -72,17 +72,16 @@ async def create_cosmetic_frame(
 
         if "error" in response_data:
             logger.error(f"Erro no use_case de cosmético: {response_data.get('error')}")
-            return JSONResponse(
-                            status_code=status_code,
-                            content={"detail": response_data.get("error")}
-            )
+            error_response(response_data["error"], status_code)
 
         logger.info("Cosmético criado com sucesso!")
-        return response_data
+        return success_response(response_data)
 
+    except HTTPException:
+        raise
     except ValueError as e:
-        logger.warning(f"Erro de validação no router: {e}")
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.warning(f"Erro de validação no router")
+        error_response(str(e), 400)
     except Exception as e:
-        logger.error(f"Erro inesperado no router de cosmético: {e}")
-        raise HTTPException(status_code=500, detail="Erro interno ao processar a criação do cosmético")
+        logger.error(f"Erro inesperado no router de cosmético")
+        error_response("Erro interno ao processar requisição", 500)

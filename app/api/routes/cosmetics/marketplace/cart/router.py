@@ -1,5 +1,5 @@
 from typing import Annotated, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, Body
+from fastapi import APIRouter, Depends, Query, Body
 from pydantic import BaseModel
 from app.auth.dependencies import get_current_user
 from app.auth.schemas import UserInfo
@@ -11,7 +11,7 @@ from .clear_cart_use_case.use_case import ClearCartUseCase
 from .validate_cart_use_case.use_case import ValidateCartUseCase, ValidateCartRequest
 from .sync_cart_use_case.use_case import SyncCartUseCase, SyncCartRequest
 from .get_item_quantity_use_case.use_case import GetItemQuantityUseCase, GetItemQuantityRequest
-from fastapi.responses import JSONResponse
+from app.utils.response import success_response, error_response
 
 router = APIRouter()
 
@@ -43,12 +43,9 @@ async def get_my_cart(
     response_data, status_code = await GetCartUseCase().execute(request)
     
     if "error" in response_data:
-        return JSONResponse(
-                status_code=status_code,
-                content={"detail": response_data.get("error")}
-        )
+        error_response(response_data["error"], status_code)
     
-    return response_data
+    return success_response(response_data)
 
 
 @router.get("/get/summary", summary="Obter resumo do meu carrinho")
@@ -61,16 +58,15 @@ async def get_my_cart_summary(
     response_data, status_code = await GetCartUseCase().execute(request)
     
     if "error" in response_data:
-        return JSONResponse(
-                status_code=status_code,
-                content={"detail": response_data.get("error")}
-        )
+        error_response(response_data["error"], status_code)
     data = response_data.get("data", {})
-    return {
+    return success_response({
         "total_items": data.get("total_items", 0),
         "total_price": data.get("total_price", 0),
         "unique_items_count": data.get("unique_items_count", 0)
-    }
+        }
+    )
+
 @router.get("/item/{listing_id}/quantity", summary="Obter quantidade de um item no carrinho")
 async def get_item_quantity(
     listing_id: str,
@@ -84,12 +80,10 @@ async def get_item_quantity(
     response_data, status_code = await GetItemQuantityUseCase().execute(request)
     
     if "error" in response_data:
-        return JSONResponse(
-                status_code=status_code,
-                content={"detail": response_data.get("error")}
-        )
+        error_response(response_data["error"], status_code)
     
-    return response_data
+    return success_response(response_data)
+
 
 
 @router.post("/add/", summary="Adicionar item ao meu carrinho")
@@ -107,12 +101,10 @@ async def add_item_to_my_cart(
     response_data, status_code = await AddItemUseCase().execute(request)
     
     if "error" in response_data:
-        return JSONResponse(
-                status_code=status_code,
-                content={"detail": response_data.get("error")}
-        )
+        error_response(response_data["error"], status_code)
     
-    return response_data
+    return success_response(response_data)
+
 
 
 @router.delete("/remove/{item_id}", summary="Remover item do meu carrinho")
@@ -126,12 +118,9 @@ async def remove_item_from_my_cart(
     response_data, status_code = await RemoveItemUseCase().execute(request)
     
     if "error" in response_data:
-        return JSONResponse(
-                status_code=status_code,
-                content={"detail": response_data.get("error")}
-        )
+        error_response(response_data["error"], status_code)
     
-    return response_data
+    return success_response(response_data)
 
 
 @router.patch("/update/{item_id}", summary="Atualizar quantidade de item")
@@ -150,12 +139,9 @@ async def update_quantity_in_my_cart(
     response_data, status_code = await UpdateQuantityUseCase().execute(request)
     
     if "error" in response_data:
-        return JSONResponse(
-                status_code=status_code,
-                content={"detail": response_data.get("error")}
-        )
+       error_response(response_data["error"], status_code)
     
-    return response_data
+    return success_response(response_data)
 
 
 @router.delete("/clear", summary="Esvaziar meu carrinho")
@@ -167,12 +153,9 @@ async def clear_my_cart(
     response_data, status_code = await ClearCartUseCase().execute(user.id)
     
     if "error" in response_data:
-        return JSONResponse(
-                status_code=status_code,
-                content={"detail": response_data.get("error")}
-        )
+        error_response(response_data["error"], status_code)
     
-    return response_data
+    return success_response(response_data)
 
 
 @router.post("/validate", summary="Validar carrinho para checkout")
@@ -184,12 +167,9 @@ async def validate_my_cart(
     response_data, status_code = await ValidateCartUseCase().execute(request)
     
     if "error" in response_data:
-        return JSONResponse(
-                status_code=status_code,
-                content={"detail": response_data.get("error")}
-        )
+        error_response(response_data["error"], status_code)
     
-    return response_data
+    return success_response(response_data)
 
 # Sincronizar carrinho
 @router.post("/sync", summary="Sincronizar carrinho com PostgreSQL")
@@ -201,9 +181,6 @@ async def sync_my_cart(
     response_data, status_code = await SyncCartUseCase().execute(request)
     
     if "error" in response_data:
-        return JSONResponse(
-                status_code=status_code,
-                content={"detail": response_data.get("error")}
-        )
+        error_response(response_data["error"], status_code)
     
-    return response_data
+    return success_response(response_data)
